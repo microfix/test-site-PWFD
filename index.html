@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pharma Workforce Denmark</title>
+  <!-- AOS Animationer -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
+  <style>
+    /* Basis reset */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      color: #5e5e5e;
+      line-height: 1.6;
+      overflow-x: hidden;
+      transition: filter 0.5s;
+    }
+
+    body.menu-open {
+      overflow: hidden;
+    }
+    /* Header */
+    header {
+      width: 100%;
+      background: #fff;
+      padding: 15px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      position: fixed;
+      top: 0;
+      z-index: 1000;
+    }
+    header .logo {
+      height: 50px;
+    }
+    /* Burger Menu Styles */
+    .burger-menu {
+      position: fixed;
+      top: 15px;
+      right: 15px;
+      cursor: pointer;
+      z-index: 9999;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 50%;
+      transition: all 0.3s ease;
+    }
+
+    .menu-open .burger-menu {
+      background-color: transparent;
+    }
+
+    .bar1, .bar2, .bar3 {
+      width: 24px;
+      height: 2px;
+      background-color: #333;
+      margin: 3px 0;
+      transition: all 0.3s ease;
+      border-radius: 2px;
+    }
+
+    .menu-open .burger-menu .bar1,
+    .menu-open .burger-menu .bar2,
+    .menu-open .burger-menu .bar3 {
+      position: absolute;
+      background-color: #fff;
+      margin: 0;
+    }
+
+    /* Burger Animation */
+    .menu-open .burger-menu .bar1 {
+      transform: rotate(45deg);
+    }
+
+    .menu-open .burger-menu .bar2 {
+      opacity: 0;
+    }
+
+    .menu-open .burger-menu .bar3 {
+      transform: rotate(-45deg);
+    }
+
+    /* Full Screen Menu Overlay */
+    .menu-overlay {
+      height: 100%;
+      width: 100%;
+      position: fixed;
+      top: 0;
+      left: 0;
+      background-color: rgba(0, 0, 0, 0.9);
+      overflow-y: hidden;
+      z-index: 9998;
+      opacity: 0;
+      visibility: hidden;
+      transition: 0.5s;
+      backdrop-filter: blur(8px);
+    }
+
+    .menu-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .overlay-content {
+      position: relative;
+      top: 50%;
+      transform: translateY(-50%);
+      text-align: center;
+    }
+
+    .overlay-content ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .overlay-content li {
+      margin: 30px 0;
+    }
+
+    .overlay-content a {
+      text-decoration: none;
+      color: #fff;
+      font-size: 2.5rem;
+      font-weight: bold;
+      transition: color 0.3s ease;
+      display: inline-block;
+    }
+
+    .overlay-content a:hover {
+      color: #006837;
+      transform: scale(1.1);
+    }
+    /* Hero sektion */
+    .hero {
+      margin-top: 80px; /* plads til header */
+      height: 100vh;
+      background: url('images/bg.png') no-repeat center center/cover;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .hero::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.35);
+    }
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      color: #fff;
+      padding: 40px 20px;
+      background: rgba(0, 0, 0, 0.65);
+      border-radius: 10px;
+      max-width: 800px;
+      margin: 0 20px;
+    }
+    .hero-content h1 {
+      font-size: 3.2rem;
+      margin-bottom: 20px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+    .hero-content p {
+      font-size: 1.3rem;
+      margin-bottom: 30px;
+    }
+    .btn {
+      padding: 15px 30px;
+      background: #006837;
+      color: #fff;
+      border: none;
+      text-transform: uppercase;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background 0.3s ease, transform 0.3s ease;
+    }
+    .btn:hover {
+      background: #004e27;
+      transform: scale(1.03);
+    }
+    /* Sektioner */
+    section {
+      padding: 80px 0;
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    section:nth-of-type(even) {
+      background: #e9e9e9;
+    }
+    section h2 {
+      text-align: center;
+      font-size: 2.2rem;
+      margin-bottom: 20px;
+      color: #006837;
+    }
+    section p {
+      max-width: 800px;
+      margin: 0 auto 20px;
+      text-align: center;
+      font-size: 1.1rem;
+      color: #5e5e5e;
+    }
+    /* Specifik regel for testimonials tekst */
+    .testimonial p {
+      color: #fff !important;
+    }
+    /* Services sektion - grid layout */
+    .services {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 40px;
+      padding: 40px 20px;
+    }
+    .service-item {
+      text-align: center;
+      padding: 20px;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      transition: transform 0.3s ease;
+    }
+    .service-item:hover {
+      transform: translateY(-8px);
+    }
+    .service-item img {
+      width: 100px;
+      height: 100px;
+      object-fit: contain;
+      margin-bottom: 15px;
+    }
+    /* Portfolio sektion */
+    .portfolio {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 30px;
+      padding: 0 20px;
+      width: min(100%, 1200px);
+      margin: 0 auto;
+    }
+    @media (max-width: 900px) {
+      .portfolio {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    @media (max-width: 600px) {
+      .portfolio {
+        grid-template-columns: 1fr;
+      }
+    }
+    .portfolio-item {
+      position: relative;
+      overflow: hidden;
+      border-radius: 10px;
+    }
+    .portfolio-item img {
+      width: 100%;
+      height: 300px;
+      display: block;
+      transition: transform 0.5s ease;
+      object-fit: cover;
+    }
+    .portfolio-item:hover img {
+      transform: scale(1.1);
+    }
+    /* Testimonials sektion */
+    .testimonials {
+      background: #006837;
+      color: #fff;
+      padding: 60px 20px;
+    }
+    .testimonial {
+      max-width: 800px;
+      margin: 0 auto 30px;
+      font-style: italic;
+    }
+    .testimonial span {
+      font-weight: bold;
+    }
+    /* Kontaktformular */
+    .contact-form {
+      max-width: 600px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+    }
+    .contact-form label {
+      margin-top: 10px;
+      font-weight: bold;
+    }
+    .contact-form input,
+    .contact-form textarea {
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 1rem;
+    }
+    .contact-form button {
+      margin-top: 20px;
+      padding: 15px;
+      background: #006837;
+      border: none;
+      color: #fff;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.3s ease, transform 0.3s ease;
+    }
+    .contact-form button:hover {
+      background: #004e27;
+      transform: scale(1.02);
+    }
+    /* Footer */
+    footer {
+      background: #5e5e5e;
+      color: #fff;
+      text-align: center;
+      padding: 20px;
+    }
+    /* Medie queries */
+    @media (max-width: 768px) {
+      header {
+        flex-direction: column;
+        align-items: center;
+        padding: 10px 15px;
+      }
+      nav ul {
+        justify-content: center;
+      }
+      nav li {
+        margin: 5px;
+      }
+      .hero-content h1 {
+        font-size: 2.5rem;
+      }
+      .hero-content p {
+        font-size: 1rem;
+      }
+      section {
+        padding: 60px 15px;
+      }
+    }
+    /* Chat Container styling */
+    #chat-container {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 320px;
+      height: 400px;
+      border: 2px solid #5e5e5e;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+      overflow: hidden;
+      z-index: 3100;
+      display: none;
+    }
+    #chat-container iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+    /* Chat Trigger med billede og tale-boble */
+    #chat-trigger {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 60px;
+      height: 60px;
+      background: transparent;
+      border-radius: 50%;
+      cursor: pointer;
+      z-index: 3000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #chat-trigger img {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      display: block;
+    }
+    .chat-tooltip {
+      position: absolute;
+      bottom: 70px;
+      right: 0;
+      background: #5e5e5e;
+      color: #fff;
+      padding: 8px 12px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      white-space: nowrap;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    }
+    .chat-tooltip::after {
+      content: "";
+      position: absolute;
+      top: 100%;
+      right: 20px;
+      border-width: 6px;
+      border-style: solid;
+      border-color: #5e5e5e transparent transparent transparent;
+    }
+    /* Få tale-boblen til at poppe op automatisk (altså synlig fra start) */
+    #chat-trigger .chat-tooltip {
+      opacity: 1;
+    }
+  </style>
+  <script>
+    function toggleMenu() {
+      document.querySelector('.burger-menu').classList.toggle('change');
+      document.querySelector('.menu-overlay').classList.toggle('active');
+      document.body.classList.toggle('menu-open');
+    }
+  </script>
+</head>
+<body>
+  <!-- Burger Menu Button -->
+  <div class="burger-menu" onclick="toggleMenu()">
+    <div class="bar1"></div>
+    <div class="bar2"></div>
+    <div class="bar3"></div>
+  </div>
+
+  <!-- Full Screen Menu Overlay -->
+  <div class="menu-overlay">
+    <nav class="overlay-content">
+      <ul>
+        <li><a href="#hero" onclick="document.getElementById('hero').scrollIntoView({behavior: 'smooth'}); toggleMenu(); return false;">Hjem</a></li>
+        <li><a href="#om-os" onclick="document.getElementById('om-os').scrollIntoView({behavior: 'smooth'}); toggleMenu(); return false;">Om os</a></li>
+        <li><a href="#services" onclick="document.getElementById('services').scrollIntoView({behavior: 'smooth'}); toggleMenu(); return false;">Services</a></li>
+        <li><a href="#portfolio" onclick="document.getElementById('portfolio').scrollIntoView({behavior: 'smooth'}); toggleMenu(); return false;">Portfolio</a></li>
+        <li><a href="#testimonials" onclick="document.getElementById('testimonials').scrollIntoView({behavior: 'smooth'}); toggleMenu(); return false;">Testimonials</a></li>
+        <li><a href="#kontakt" onclick="document.getElementById('kontakt').scrollIntoView({behavior: 'smooth'}); toggleMenu(); return false;">Kontakt</a></li>
+      </ul>
+    </nav>
+  </div>
+
+  <!-- Header -->
+  <header>
+    <img src="images/logo.png" alt="Pharma Workforce Denmark Logo" class="logo" data-aos="fade-down">
+  </header>
+
+  <!-- Hero Sektion -->
+  <section class="hero" id="hero">
+    <div class="hero-content" data-aos="zoom-in" data-aos-delay="300">
+      <h1 data-aos="fade-up">Fjern stressen – vi leverer arbejdskraften</h1>
+      <p data-aos="fade-up" data-aos-delay="150">
+        Pharma Workforce Denmark forbinder hovede entreprenører med kvalificeret arbejdskraft uden besvær.
+      </p>
+      <button class="btn" data-aos="flip-up" onclick="document.getElementById('kontakt').scrollIntoView({behavior: 'smooth'});">
+        Kontakt os
+      </button>
+    </div>
+  </section>
+
+  <!-- Om os Sektion -->
+  <section id="om-os" data-aos="fade-right">
+    <h2 data-aos="fade-up">Om os</h2>
+    <p data-aos="fade-up" data-aos-delay="150">
+      Pharma Workforce Denmark har over 15 års erfaring inden for pharma construction og har opbygget et ry for at levere førsteklasses arbejdskraft til store entreprenørprojekter. Vi forstår, at når det gælder pharma-industrien, er kvalitet og præcision altafgørende – ikke blot for at undgå dyre forsinkelser og dagbøder, men også for at sikre en problemfri drift og langtidsholdbare resultater.
+      <br><br>
+      Vores team består af eksperter, der kender branchens krav og udfordringer ud og ind. Vi skaber tætte relationer med vores kunder for at tilbyde skræddersyede løsninger, der matcher deres specifikke behov. Med et skarpt fokus på effektivitet og kvalitet sikrer vi, at du får leveret den rette arbejdskraft – til tiden og uden overraskelser.
+      <br><br>
+      Hos Pharma Workforce Denmark handler det om mere end blot at stille arbejdskraft til rådighed – vi leverer en værdifuld service, der sparer dig for stress, administrative byrder og unødvendige omkostninger.
+    </p>
+  </section>
+
+  <!-- Services Sektion -->
+  <section id="services" data-aos="fade-up">
+    <h2 data-aos="fade-up">Vores Services</h2>
+    <div class="services">
+      <div class="service-item" data-aos="zoom-in">
+        <img src="images/img1.jpg" alt="Rekruttering">
+        <h3 data-aos="fade-up" data-aos-delay="50">Rekruttering</h3>
+        <p data-aos="fade-up" data-aos-delay="100">
+          Vi matcher den rette arbejdskraft med dine behov og sikrer en problemfri rekrutteringsproces.
+        </p>
+      </div>
+      <div class="service-item" data-aos="zoom-in" data-aos-delay="100">
+        <img src="images/img2.jpg" alt="Procesoptimering">
+        <h3 data-aos="fade-up" data-aos-delay="150">Procesoptimering</h3>
+        <p data-aos="fade-up" data-aos-delay="200">
+          Vi optimerer dine forretningsprocesser for at øge effektiviteten og reducere omkostninger.
+        </p>
+      </div>
+      <div class="service-item" data-aos="zoom-in" data-aos-delay="200">
+        <img src="images/img3.png" alt="Talent Management">
+        <h3 data-aos="fade-up" data-aos-delay="250">Talent Management</h3>
+        <p data-aos="fade-up" data-aos-delay="300">
+          Vi hjælper med at udvikle og fastholde dine nøglemedarbejdere for at styrke din virksomheds performance.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Portfolio Sektion -->
+  <section id="portfolio" data-aos="fade-up">
+    <h2 data-aos="fade-up">Portfolio</h2>
+    <div class="portfolio">
+      <div class="portfolio-item" data-aos="flip-left">
+        <img src="images/img1.jpg" alt="Projekt 1">
+      </div>
+      <div class="portfolio-item" data-aos="flip-up" data-aos-delay="100">
+        <img src="images/img2.jpg" alt="Projekt 2">
+      </div>
+      <div class="portfolio-item" data-aos="flip-right" data-aos-delay="200">
+        <img src="images/img3.png" alt="Projekt 3">
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonials Sektion -->
+  <section id="testimonials" class="testimonials" data-aos="fade-up">
+    <h2 data-aos="fade-up">Hvad vores kunder siger</h2>
+    <div class="testimonial" data-aos="flip-up">
+      <p>"Pharma Workforce Denmark har gjort vores rekrutteringsproces ubesværet og effektiv. Anbefales varmt!"</p>
+      <span>- Kunde A</span>
+    </div>
+    <div class="testimonial" data-aos="flip-up" data-aos-delay="150">
+      <p>"Fantastisk service og personlig support – vi føler os trygge med deres løsninger."</p>
+      <span>- Kunde B</span>
+    </div>
+  </section>
+
+  <!-- Kontakt Sektion -->
+  <section id="kontakt" data-aos="fade-up">
+    <h2 data-aos="fade-up">Kontakt os</h2>
+    <form action="#" method="post" class="contact-form" data-aos="zoom-in">
+      <label for="navn">Navn:</label>
+      <input type="text" id="navn" name="navn" required>
+      
+      <label for="email">Email:</label>
+      <input type="email" id="email" name="email" required>
+      
+      <label for="telefon">Telefonnummer:</label>
+      <input type="tel" id="telefon" name="telefon" required>
+      
+      <label for="firma">Firma:</label>
+      <input type="text" id="firma" name="firma" required>
+      
+      <label for="stilling">Stilling:</label>
+      <input type="text" id="stilling" name="stilling" required>
+      
+      <label for="besked">Besked:</label>
+      <textarea id="besked" name="besked" rows="5" required></textarea>
+      
+      <button type="submit">Send</button>
+    </form>
+  </section>
+
+  <!-- Footer -->
+  <footer data-aos="fade-up">
+    <p>&copy; 2025 Pharma Workforce Denmark. Alle rettigheder forbeholdes.</p>
+  </footer>
+
+  <!-- Chat Container med iframe til chat.html -->
+  <div id="chat-container">
+    <iframe src="chat.html"></iframe>
+  </div>
+
+  <!-- Chat Trigger med billede og automatisk visning af tale-boble -->
+  <style>
+    #chat-trigger {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 60px;
+      height: 60px;
+      background: transparent;
+      border-radius: 50%;
+      cursor: pointer;
+      z-index: 3000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #chat-trigger img {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      display: block;
+    }
+    .chat-tooltip {
+      position: absolute;
+      bottom: 70px;
+      right: 0;
+      background: #5e5e5e;
+      color: #fff;
+      padding: 8px 12px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      white-space: nowrap;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    }
+    .chat-tooltip::after {
+      content: "";
+      position: absolute;
+      top: 100%;
+      right: 20px;
+      border-width: 6px;
+      border-style: solid;
+      border-color: #5e5e5e transparent transparent transparent;
+    }
+  </style>
+  
+  <div id="chat-trigger" data-aos="zoom-in" data-aos-delay="500">
+    <img src="images/chat.png" alt="Chat Icon">
+    <div class="chat-tooltip">Snak med vores AI hvis du har spørgsmål</div>
+  </div>
+  
+  <script>
+    // Vis chat-trigger efter 5 sekunder
+    setTimeout(() => {
+      document.getElementById('chat-trigger').style.display = 'flex';
+    }, 5000);
+  
+    // Når chat-trigger klikkes, vis chat-containeren og skjul triggeren
+    document.getElementById('chat-trigger').addEventListener('click', function() {
+      document.getElementById('chat-container').style.display = 'block';
+      document.getElementById('chat-trigger').style.display = 'none';
+    });
+  
+    // Lyt efter postMessage for at vise triggeren igen, hvis chatten lukkes
+    window.addEventListener('message', function(event) {
+      if (event.data.action === "closeChat") {
+        document.getElementById('chat-container').style.display = 'none';
+        document.getElementById('chat-trigger').style.display = 'flex';
+      }
+    });
+  </script>
+  
+  <!-- AOS Script -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+  <script>
+    AOS.init({
+      duration: 1000,
+      once: true,
+      easing: 'ease-in-out'
+    });
+  </script>
+  <script src="script.js"></script>
+</body>
+</html>

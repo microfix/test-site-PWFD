@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+  <meta charset="UTF-8">
+  <title>Chat</title>
+  <style>
+    /* Reset og basis */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: #fff;
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+    .chat-container {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+    header {
+      background: #fff;
+      color: #000;
+      padding: 12px 16px;
+      text-align: center;
+      font-size: 1.1rem;
+      font-weight: bold;
+      border-bottom: 1px solid #ddd;
+      position: relative;
+    }
+    header button {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      font-size: 1rem;
+      color: #5e5e5e;
+      cursor: pointer;
+    }
+    .chat-body {
+      flex: 1;
+      padding: 10px;
+      background: #f6f6f6;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+    }
+    /* Outgoing beskeder */
+    .message.outgoing {
+      align-self: flex-end;
+      background: #007aff;
+      color: #fff;
+      padding: 10px 14px;
+      margin: 8px 0;
+      border-radius: 20px;
+      max-width: 75%;
+      font-size: 0.95rem;
+      word-wrap: break-word;
+    }
+    /* Incoming beskeder med profilbillede */
+    .message.incoming {
+      display: flex;
+      align-items: flex-start;
+      margin: 8px 0;
+      max-width: 75%;
+    }
+    .message.incoming img.profile {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      margin-right: 8px;
+      flex-shrink: 0;
+    }
+    .message.incoming .bubble-text {
+      background: #e5e5ea;
+      color: #000;
+      padding: 10px 14px;
+      border-radius: 20px;
+      font-size: 0.95rem;
+      word-wrap: break-word;
+      align-self: center;
+    }
+    .chat-input-area {
+      display: flex;
+      border-top: 1px solid #ddd;
+      padding: 8px;
+      background: #fff;
+    }
+    .chat-input-area input[type="text"] {
+      flex: 1;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 20px;
+      outline: none;
+      font-size: 1rem;
+    }
+    .chat-input-area button {
+      background: #007aff;
+      color: #fff;
+      border: none;
+      padding: 10px 16px;
+      margin-left: 8px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background 0.3s;
+    }
+    .chat-input-area button:hover {
+      background: #0051c7;
+    }
+  </style>
+</head>
+<body>
+  <div class="chat-container">
+    <header>
+      <button id="chat-close">Luk</button>
+      Chat
+    </header>
+    <div class="chat-body" id="chat-body">
+      <!-- Chatbeskeder vises her -->
+    </div>
+    <div class="chat-input-area">
+      <input type="text" id="chat-input" placeholder="Skriv din besked...">
+      <button id="chat-send">Send</button>
+    </div>
+  </div>
+  <script>
+    const webhookURL = "https://n8nn.microfix.dk/webhook/f5c0fc8e-d2ce-4678-97a6-699fae568ed4";
+    const chatBody = document.getElementById('chat-body');
+    const inputField = document.getElementById('chat-input');
+    const sendButton = document.getElementById('chat-send');
+    const closeButton = document.getElementById('chat-close');
+
+    // Når Luk-knappen klikkes, sendes besked til forældresiden for at lukke chatten
+    closeButton.addEventListener('click', function() {
+      window.parent.postMessage({ action: "closeChat" }, "*");
+    });
+
+    // Funktion til at tilføje outgoing besked
+    function appendOutgoingMessage(message) {
+      const msgDiv = document.createElement('div');
+      msgDiv.className = 'message outgoing';
+      msgDiv.textContent = message;
+      chatBody.appendChild(msgDiv);
+      chatBody.scrollTop = chatBody.scrollHeight;
+    }
+
+    // Funktion til at tilføje incoming besked med profilbillede
+    function appendIncomingMessage(message) {
+      const container = document.createElement('div');
+      container.className = 'message incoming';
+      const profileImg = document.createElement('img');
+      profileImg.src = "images/chat.png";
+      profileImg.alt = "AI";
+      profileImg.className = 'profile';
+      const bubble = document.createElement('div');
+      bubble.className = 'bubble-text';
+      bubble.textContent = message;
+      container.appendChild(profileImg);
+      container.appendChild(bubble);
+      chatBody.appendChild(container);
+      chatBody.scrollTop = chatBody.scrollHeight;
+    }
+
+    async function sendMessage() {
+      const message = inputField.value.trim();
+      if (!message) return;
+      appendOutgoingMessage(message);
+      inputField.value = "";
+      try {
+        const response = await fetch(webhookURL, {
+          method: 'POST',
+          mode: 'cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message })
+        });
+        if (!response.ok) throw new Error("HTTP error " + response.status);
+        let data = await response.json();
+        // Hvis data er en streng, forsøg at parse den
+        if (typeof data === 'string') {
+          try { data = JSON.parse(data); } catch(e) { console.error("Parsing error:", e); }
+        }
+        console.log("Modtaget data:", data);
+        let reply = "Tak for din besked!";
+        if (Array.isArray(data) && data.length > 0) {
+          reply = data[0].output || reply;
+        } else if (data.output) {
+          reply = data.output;
+        }
+        appendIncomingMessage(reply);
+      } catch (error) {
+        console.error("Error:", error);
+        appendIncomingMessage("Der opstod en fejl. Prøv igen senere.");
+      }
+    }
+
+    sendButton.addEventListener('click', sendMessage);
+    inputField.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        sendMessage();
+      }
+    });
+  </script>
+</body>
+</html>
